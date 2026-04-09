@@ -2,58 +2,114 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Mini App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Kyoto Minimalist Menu</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* ตั้งค่าสีให้ตรงกับธีมของ Telegram */
+        /* 1. คุมโทนสีให้เข้ากับ Telegram แบบอัตโนมัติ */
+        :root {
+            --bg: var(--tg-theme-bg-color, #ffffff);
+            --text: var(--tg-theme-text-color, #222222);
+            --hint: var(--tg-theme-hint-color, #999999);
+            --button: var(--tg-theme-button-color, #248bed);
+            --button-text: var(--tg-theme-button-text-color, #ffffff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #f4f4f4);
+        }
+
         body {
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #222222);
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
             margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
         }
-        .container { text-align: center; padding: 20px; }
-        .user-photo { width: 100px; border-radius: 50%; border: 3px solid var(--tg-theme-button-color); }
-        button {
-            background-color: var(--tg-theme-button-color, #248bed);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
+
+        /* 2. การจัด Layout แบบ Cinematic */
+        .hero-banner {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(to bottom, transparent, var(--bg)), 
+                        url('sushi-1.jpg') center/cover; /* เปลี่ยนเป็นชื่อไฟล์รูปของคุณ */
+            position: relative;
         }
+
+        .content { padding: 20px; margin-top: -50px; }
+
+        .title { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+        .subtitle { color: var(--hint); font-size: 14px; margin-bottom: 25px; }
+
+        /* 3. Card สินค้าแบบ Minimalist */
+        .product-card {
+            background-color: var(--secondary-bg);
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+
+        .product-card:active { transform: scale(0.98); }
+
+        .product-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .product-info { flex: 1; }
+        .product-name { font-weight: 600; font-size: 16px; }
+        .product-price { color: var(--button); font-weight: 700; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 id="greeting">สวัสดี!</h1>
-        <p>นี่คือ Mini App แรกของคุณ</p>
-        <button id="main-btn">ส่งข้อมูลกลับไปที่บอท</button>
+
+    <div class="hero-banner"></div>
+
+    <div class="content">
+        <div class="title" id="user-name">Welcome</div>
+        <div class="subtitle">Experience the art of Shokunin</div>
+
+        <div class="product-card" onclick="selectItem('Premium Omakase Set', 1200)">
+            <img src="sushi-1.jpg" class="product-img"> <div class="product-info">
+                <div class="product-name">Premium Omakase Set</div>
+                <div class="product-price">1,200 THB</div>
+            </div>
+        </div>
+
+        <div class="product-card" onclick="selectItem('Signature Salmon Roll', 350)">
+            <img src="Pod pro 2.png" class="product-img"> <div class="product-info">
+                <div class="product-name">Signature Salmon Roll</div>
+                <div class="product-price">350 THB</div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // เริ่มต้นใช้งาน Telegram WebApp
         const tg = window.Telegram.WebApp;
-        tg.expand(); // ทำให้แอปเปิดขึ้นมาเต็มหน้าจอ
+        tg.expand(); // ขยายแอปให้เต็มจอ
 
-        // แสดงชื่อผู้ใช้จาก Telegram
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            document.getElementById('greeting').innerText = `สวัสดีคุณ ${user.first_name}!`;
+        // ดึงชื่อลูกค้ามาโชว์ให้ดูพรีเมียม
+        if (tg.initDataUnsafe?.user) {
+            document.getElementById('user-name').innerText = `Kon'nichiwa, ${tg.initDataUnsafe.user.first_name}`;
         }
 
-        // เมื่อกดปุ่ม
-        document.getElementById('main-btn').addEventListener('click', () => {
-            tg.sendData("Hello from Mini App!"); // ส่งข้อความกลับไปที่บอท
-            tg.close(); // ปิดแอป
+        function selectItem(name, price) {
+            // ระบบสั่นตอนกดเลือก (Haptic Feedback) ให้ความรู้สึกแอปพรีเมียม
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            // เปิดปุ่มหลัก (Main Button) ของ Telegram ด้านล่าง
+            tg.MainButton.text = `Order ${name} (${price} THB)`;
+            tg.MainButton.show();
+        }
+
+        // เมื่อกดปุ่มใหญ่ด้านล่าง
+        tg.onEvent('mainButtonClicked', function(){
+            tg.sendData("Ordered: " + tg.MainButton.text);
+            tg.close();
         });
     </script>
 </body>
