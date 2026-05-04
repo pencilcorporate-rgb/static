@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STATIC Mini App - Grid 2 Columns</title>
+    <title>STATIC Mini App - Grid Icon Placeholder</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -24,7 +24,7 @@
             overflow-x: hidden;
         }
 
-        /* Header & Search */
+        /* --- Header & Search --- */
         header {
             padding: 20px;
             display: flex;
@@ -43,7 +43,7 @@
         }
         .search-bar input { background: transparent; border: none; color: white; margin-left: 10px; outline: none; width: 100%; font-size: 14px; }
 
-        /* Banner */
+        /* --- Banner Slide --- */
         .banner-container { padding: 0 20px; margin-bottom: 25px; }
         .banner-slide {
             background: #1c1c1c;
@@ -54,17 +54,17 @@
             align-items: center;
             position: relative;
         }
+        .banner-slide i { color: #333; font-size: 60px; }
 
-        /* Grid Layout: แถวละ 2 การ์ด */
+        /* --- Grid Layout (แถวละ 2 การ์ด) --- */
         .menu-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* แบ่ง 2 คอลัมน์ */
-            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             padding: 0 20px 120px;
-            justify-items: center;
         }
 
-        /* Card Size: 555x318 px (Scale down for mobile screens) */
+        /* --- Card (555x318 px) --- */
         .item-card {
             background: var(--card-bg);
             border-radius: 25px;
@@ -72,19 +72,16 @@
             align-items: center;
             padding: 12px;
             gap: 12px;
-            
-            /* กำหนดขนาดตามโจทย์ (ใช้ max-width เพื่อให้แสดงผลในมือถือได้ไม่ล้น) */
-            width: 100%; 
-            max-width: 555px; 
-            height: 318px; 
+            width: 100%;
+            height: 318px; /* ความสูงตามโจทย์ */
             box-sizing: border-box;
         }
 
-        /* Image Size: 200x285 px */
+        /* --- Image Box (200x285 px) --- */
         .item-image-box {
             width: 200px;
             height: 285px;
-            background: #2a2a2a;
+            background: #2a2a2a; /* สีเทาเข้มเหมือนในดีไซน์ */
             border-radius: 20px;
             overflow: hidden;
             flex-shrink: 0;
@@ -93,17 +90,24 @@
             justify-content: center;
         }
 
+        /* สำหรับ Icon รูปภาพกรณีไม่มีรูป */
+        .item-image-box i {
+            color: #3d3d3d; /* สีไอคอนเข้มๆ สไตล์ Minimal */
+            font-size: 50px;
+        }
+
         .item-image-box img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* รูปไม่เสียสัดส่วน */
+            object-fit: cover;
         }
 
+        /* --- Info Section --- */
         .item-info {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            height: 285px; /* ให้สูงเท่ารูปภาพเพื่อจัดวางข้อความ */
+            height: 285px;
             justify-content: space-between;
         }
 
@@ -112,6 +116,7 @@
             margin: 0;
             font-weight: 700;
             line-height: 1.2;
+            word-break: break-word;
         }
 
         .item-info p {
@@ -135,7 +140,7 @@
             border-radius: 12px;
         }
 
-        /* Bottom Nav */
+        /* --- Bottom Navigation --- */
         .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -144,11 +149,10 @@
             justify-content: space-around;
             padding: 12px 0 20px;
             border-top: 1px solid #222;
-            z-index: 100;
         }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); text-decoration: none; font-size: 10px; }
         .nav-item.active { color: var(--primary-green); }
-        .nav-item i { font-size: 20px; }
+        .nav-item i { font-size: 22px; }
     </style>
 </head>
 <body>
@@ -163,13 +167,12 @@
 
     <div class="banner-container">
         <div class="banner-slide">
-            <i class="fa-regular fa-image" style="color:#333; font-size:60px;"></i>
+            <i class="fa-regular fa-image"></i> <!-- Icon Banner -->
         </div>
     </div>
 
-    <!-- แถวละ 2 การ์ด -->
     <div class="menu-grid">
-        <!-- Card 1 -->
+        <!-- การ์ด 1: แสดงรูปภาพจริง (Product.jpg) -->
         <div class="item-card">
             <div class="item-image-box">
                 <img src="Product.jpg" alt="Product">
@@ -185,23 +188,37 @@
             </div>
         </div>
 
-        <!-- Card 2 -->
+        <!-- การ์ด 2: ยังไม่ได้อัปโหลดรูป (แสดง Icon เหมือน Banner) -->
         <div class="item-card">
             <div class="item-image-box">
-                <img src="Product_2.jpg" alt="Product">
+                <i class="fa-regular fa-image"></i> <!-- Icon Placeholder -->
+            </div>
+            <div class="item-info">
+                <div>
+                    <h3>Marbro</h3>
+                    <p>ประเภท: น้ำยา<br>หอมสดชื่น</p>
+                </div>
+                <div class="tag-row">
+                    <div class="tag">Disposable</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- การ์ด 3: ตัวอย่างกรณีไม่มีรูปอีกใบ -->
+        <div class="item-card">
+            <div class="item-image-box">
+                <i class="fa-regular fa-image"></i>
             </div>
             <div class="item-info">
                 <div>
                     <h3>Pod Large</h3>
-                    <p>ประเภท: ตัวเครื่อง<br>รองรับ Infinity 2 plus</p>
+                    <p>ประเภท: เครื่อง<br>ทนทานใช้งานง่าย</p>
                 </div>
                 <div class="tag-row">
                     <div class="tag">Device</div>
                 </div>
             </div>
         </div>
-
-        <!-- เพิ่มการ์ดอื่นๆ ได้ที่นี่ -->
     </div>
 
     <nav class="bottom-nav">
@@ -215,7 +232,6 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.headerColor = '#0e0e0e';
     </script>
 </body>
 </html>
