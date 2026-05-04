@@ -3,236 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STATIC Mini App</title>
+    <title>STATIC Mini App - Product Grid</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0e0e0e;
+            --bg-color: #0b0b0b;
             --card-bg: #1c1c1c;
             --primary-green: #a2ff00;
             --text-main: #ffffff;
             --text-muted: #888888;
+            --search-bg: #1a1a1a;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 0; overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 0;
         }
 
-        /* --- Header --- */
+        /* --- Header & Search Section --- */
         header {
-            padding: 20px;
+            padding: 15px 20px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
+            gap: 15px;
         }
-        .logo { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
-        .logo span { color: var(--primary-green); }
-        .search-bar {
-            background: #1a1a1a;
-            border-radius: 10px;
-            padding: 8px 15px;
+        .logo-box { width: 120px; }
+        .logo-box img { width: 100%; height: auto; } /* ใส่โลโก้ STATIC ตามภาพ */
+        
+        .search-container {
+            flex-grow: 1;
+            background: var(--search-bg);
+            border-radius: 12px;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
-            width: 55%;
+            gap: 10px;
         }
-        .search-bar input { background: transparent; border: none; color: white; margin-left: 10px; outline: none; width: 100%; font-size: 14px; }
+        .search-container i { color: #555; font-size: 14px; }
+        .search-container input {
+            background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px;
+        }
 
-        /* --- Banner Auto-Slide --- */
-        .banner-container {
+        /* --- Auto-Slide Banner --- */
+        .banner-view {
             padding: 0 20px;
             margin-bottom: 25px;
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
         }
-        .banner-wrapper {
+        .banner-track {
             display: flex;
-            transition: transform 0.5s ease-in-out;
-            width: 300%; /* สำหรับ 3 รูป */
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 300%; /* 3 Slides */
         }
-        .banner-slide {
+        .slide {
             width: 100%;
-            height: 180px;
-            background: #1c1c1c;
-            border-radius: 30px;
+            height: 200px;
+            background: #222;
+            border-radius: 25px;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-shrink: 0;
         }
-        .banner-slide i { color: #333; font-size: 60px; }
-        .dots {
+        .slide i { font-size: 80px; color: #333; }
+        
+        .indicator-dots {
             position: absolute;
             bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
         .dot { width: 6px; height: 6px; background: #333; border-radius: 50%; }
-        .dot.active { background: var(--text-muted); }
+        .dot.active { background: #666; width: 12px; border-radius: 10px; }
 
-        /* --- Grid Layout (แถวละ 2) --- */
-        .menu-grid {
+        /* --- Product Grid 2 Columns --- */
+        .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            padding: 0 20px 120px;
+            gap: 10px;
+            padding: 0 15px 120px;
         }
 
-        /* --- Card (Size 555x318 px) --- */
-        .item-card {
+        /* Card Layout: รูปซ้าย ข้อความขวา */
+        .product-card {
             background: var(--card-bg);
-            border-radius: 25px;
+            border-radius: 20px;
             display: flex;
+            padding: 10px;
+            gap: 10px;
             align-items: center;
-            padding: 12px;
-            gap: 12px;
-            width: 100%; 
-            height: 318px; /* ขนาดเป๊ะตามระบุ */
-            box-sizing: border-box;
+            height: 120px; /* ปรับให้ดูสมดุลในมือถือ */
         }
 
-        /* --- Image Box (Size 200x285 px) --- */
-        .item-image-box {
-            width: 200px; /* ขนาดเป๊ะตามระบุ */
-            height: 285px; /* ขนาดเป๊ะตามระบุ */
+        /* สัดส่วนรูปภาพ */
+        .image-placeholder {
+            width: 75px;
+            height: 90px;
             background: #2a2a2a;
-            border-radius: 20px;
-            flex-shrink: 0;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            flex-shrink: 0;
         }
-        .item-image-box i { color: #3d3d3d; font-size: 50px; }
-        .item-image-box img { width: 100%; height: 100%; object-fit: cover; }
+        .image-placeholder i { font-size: 30px; color: #3d3d3d; }
 
-        /* --- Info Area (Right Side) --- */
-        .item-info {
-            flex-grow: 1;
+        /* รายละเอียดด้านขวา */
+        .content-box {
             display: flex;
             flex-direction: column;
-            height: 285px;
             justify-content: space-between;
+            height: 90px;
+            overflow: hidden;
         }
-        .item-info h3 { font-size: 18px; margin: 0; font-weight: 700; line-height: 1.2; }
-        .item-info p { font-size: 11px; color: var(--text-muted); margin: 5px 0 auto 0; line-height: 1.3; }
-        
-        .tag-row { display: flex; justify-content: flex-end; }
-        .tag {
-            background: linear-gradient(90deg, #38ef7d, #a2ff00);
-            color: black;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 4px 12px;
-            border-radius: 12px;
+        .content-box h3 {
+            font-size: 13px; margin: 0; font-weight: bold; line-height: 1.2;
+        }
+        .content-box p {
+            font-size: 9px; color: var(--text-muted); margin: 3px 0; line-height: 1.1;
         }
 
-        /* --- Bottom Nav --- */
-        .bottom-nav {
+        /* Tag ด้านล่างขวา */
+        .tag-wrapper { display: flex; justify-content: flex-end; }
+        .status-tag {
+            background: linear-gradient(90deg, #2ecc71, #a2ff00);
+            color: #000;
+            font-size: 8px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+        .tag-device { background: linear-gradient(90deg, #a2ff00, #38ef7d); }
+
+        /* --- Navigation Bar --- */
+        .nav-bar {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            background: #111;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
-            padding: 12px 0 20px;
-            border-top: 1px solid #222;
+            padding: 10px 0 25px;
+            border-top: 1px solid #1a1a1a;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); text-decoration: none; font-size: 10px; position: relative; }
-        .nav-item.active { color: var(--primary-green); }
-        .nav-item i { font-size: 22px; }
-        .badge { background: var(--primary-green); color: black; font-size: 9px; padding: 1px 4px; border-radius: 10px; position: absolute; top: -5px; right: -8px; font-weight: bold; }
+        .nav-btn {
+            display: flex; flex-direction: column; align-items: center; color: #555; text-decoration: none; font-size: 10px; gap: 5px; position: relative;
+        }
+        .nav-btn.active { color: var(--primary-green); }
+        .nav-btn i { font-size: 20px; }
+        .cart-count {
+            position: absolute; top: -5px; right: -8px; background: var(--primary-green); color: black; font-size: 9px; padding: 1px 4px; border-radius: 50%; font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo"><i class="fa-solid fa-bolt" style="color: var(--primary-green);"></i> STATIC</div>
-        <div class="search-bar">
-            <i class="fa-solid fa-magnifying-glass" style="color: #444;"></i>
+        <div class="logo-box">
+             <i class="fa-solid fa-bolt" style="color: var(--primary-green); font-size: 24px;"></i>
+             <span style="font-weight: 900; font-size: 20px;">STATIC</span>
+        </div>
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" placeholder="ค้นหาสินค้า">
         </div>
     </header>
 
-    <div class="banner-container">
-        <div class="banner-wrapper" id="bannerWrapper">
-            <div class="banner-slide"><i class="fa-regular fa-image"></i></div>
-            <div class="banner-slide"><i class="fa-regular fa-image"></i></div>
-            <div class="banner-slide"><i class="fa-regular fa-image"></i></div>
+    <!-- Banner สไลด์อัตโนมัติ -->
+    <div class="banner-view">
+        <div class="banner-track" id="track">
+            <div class="slide"><i class="fa-regular fa-image"></i></div>
+            <div class="slide"><i class="fa-regular fa-image"></i></div>
+            <div class="slide"><i class="fa-regular fa-image"></i></div>
         </div>
-        <div class="dots">
+        <div class="indicator-dots">
             <div class="dot active"></div>
             <div class="dot"></div>
             <div class="dot"></div>
         </div>
     </div>
 
-    <div class="menu-grid">
-        <!-- Card 1 -->
-        <div class="item-card">
-            <div class="item-image-box"><i class="fa-regular fa-image"></i></div>
-            <div class="item-info">
-                <div><h3>Pod Large</h3><p>ประเภท: หัวพอต<br>ใช้ร่วมกับ Infinity 2 plus</p></div>
-                <div class="tag-row"><div class="tag">Disposable</div></div>
+    <!-- Product Grid แถวละ 2 -->
+    <div class="grid-container">
+        <!-- Item 1 -->
+        <div class="product-card">
+            <div class="image-placeholder"><i class="fa-regular fa-image"></i></div>
+            <div class="content-box">
+                <div>
+                    <h3>Pod Large</h3>
+                    <p>ประเภท: หัวพอต (ใช้แล้วทิ้ง)<br>ใช้ร่วมกับ Infinity 2 plus<br>และ Essential 2</p>
+                </div>
+                <div class="tag-wrapper"><span class="status-tag">Disposable</span></div>
             </div>
         </div>
-        <!-- Card 2 -->
-        <div class="item-card">
-            <div class="item-image-box"><i class="fa-regular fa-image"></i></div>
-            <div class="item-info">
-                <div><h3>Creator<br>Pod Clear</h3><p>ประเภท: หัวพอต<br>ใช้ร่วมกับ Creator Device</p></div>
-                <div class="tag-row"><div class="tag">Disposable</div></div>
+        <!-- Item 2 -->
+        <div class="product-card">
+            <div class="image-placeholder"><i class="fa-regular fa-image"></i></div>
+            <div class="content-box">
+                <div>
+                    <h3>Creator<br>Pod Clear</h3>
+                    <p>ประเภท: หัวพอต (เติมน้ำยา)<br>ใช้ร่วมกับ Creator Device</p>
+                </div>
+                <div class="tag-wrapper"><span class="status-tag">Disposable</span></div>
             </div>
         </div>
-        <!-- Card 3 -->
-        <div class="item-card">
-            <div class="item-image-box"><i class="fa-regular fa-image"></i></div>
-            <div class="item-info">
-                <div><h3>Marbro</h3><p>ประเภท: น้ำยา<br>หอมสดชื่น</p></div>
-                <div class="tag-row"><div class="tag">Disposable</div></div>
+        <!-- Item 3 -->
+        <div class="product-card">
+            <div class="image-placeholder"><i class="fa-regular fa-image"></i></div>
+            <div class="content-box">
+                <div>
+                    <h3>Creator<br>Boost Pod</h3>
+                    <p>ประเภท: เครื่อง<br>ใช้ร่วมกับ Creator Pod<br>และ Creator Boost Pod</p>
+                </div>
+                <div class="tag-wrapper"><span class="status-tag tag-device">Device</span></div>
             </div>
         </div>
-        <!-- Card 4 -->
-        <div class="item-card">
-            <div class="item-image-box"><i class="fa-regular fa-image"></i></div>
-            <div class="item-info">
-                <div><h3>Creator<br>Boost Pod</h3><p>ประเภท: เครื่อง<br>ใช้ร่วมกับ Creator Pod</p></div>
-                <div class="tag-row"><div class="tag" style="background: linear-gradient(90deg, #a2ff00, #38ef7d);">Device</div></div>
+        <!-- Item 4 -->
+        <div class="product-card">
+            <div class="image-placeholder"><i class="fa-regular fa-image"></i></div>
+            <div class="content-box">
+                <div>
+                    <h3>Marbro</h3>
+                    <p>น้ำยาซอลต์นิค</p>
+                </div>
+                <div class="tag-wrapper"><span class="status-tag">Disposable</span></div>
             </div>
         </div>
     </div>
 
-    <nav class="bottom-nav">
-        <a href="#" class="nav-item"><i class="fa-solid fa-percent"></i><span>โปรโมชัน</span></a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i><span>สินค้าที่ชอบ</span></a>
-        <a href="#" class="nav-item active"><i class="fa-solid fa-box-open"></i><span>สินค้า</span></a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-cart-shopping"></i><span class="badge">20</span><span>รถเข็น</span></a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i><span>โปรไฟล์</span></a>
+    <!-- Bottom Navigation -->
+    <nav class="nav-bar">
+        <a href="#" class="nav-btn"><i class="fa-solid fa-receipt"></i>โปรโมชัน</a>
+        <a href="#" class="nav-btn"><i class="fa-solid fa-heart"></i>สินค้าที่ชอบ</a>
+        <a href="#" class="nav-btn active"><i class="fa-solid fa-shapes"></i>สินค้า</a>
+        <a href="#" class="nav-btn">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-count">20</span>
+            ตระกร้าสินค้า
+        </a>
+        <a href="#" class="nav-btn"><i class="fa-solid fa-user"></i>โปรไฟล์</a>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- Auto Banner Slide Script ---
-        let currentIndex = 0;
-        const slides = document.querySelectorAll('.banner-slide');
+        // --- ระบบสไลด์อัตโนมัติ ---
+        let pos = 0;
+        const track = document.getElementById('track');
         const dots = document.querySelectorAll('.dot');
-        const wrapper = document.getElementById('bannerWrapper');
-
-        function showSlide(index) {
-            wrapper.style.transform = `translateX(-${index * (100 / 3)}%)`;
-            dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-        }
 
         setInterval(() => {
-            currentIndex = (currentIndex + 1) % 3;
-            showSlide(currentIndex);
-        }, 3000); // สไลด์ทุกๆ 5 วินาที
+            pos = (pos + 1) % 3;
+            track.style.transform = `translateX(-${pos * (100 / 3)}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === pos));
+        }, 3000);
     </script>
+</body>
+</html>
 </body>
 </html>
